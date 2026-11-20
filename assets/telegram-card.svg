@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 460 820" width="460" height="820" role="img" aria-labelledby="t d">
+  <title id="t">Approval card on Telegram</title>
+  <desc id="d">A Telegram message from the gate bot showing tool write_file on server filesystem with its arguments, an auto-block countdown, and Block, Allow and Always allow buttons; below it, an earlier card stamped Allowed.</desc>
+  <style>
+    .f{font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
+    .m{font:500 12.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#1f2328}
+  </style>
+  <rect x="10" y="10" width="440" height="800" rx="54" fill="#1f2328"/>
+  <rect x="24" y="24" width="412" height="772" rx="42" fill="#dfe8f1"/>
+  <rect x="160" y="34" width="140" height="26" rx="13" fill="#1f2328"/>
+  <!-- header -->
+  <rect x="24" y="70" width="412" height="62" fill="#ffffff"/>
+  <circle cx="72" cy="101" r="20" fill="#0969da"/>
+  <path d="M72 88l13 5v9c0 9-6 15-13 18-7-3-13-9-13-18v-9z" fill="#fff"/>
+  <text x="102" y="97" class="f" style="font-weight:600;font-size:16px;fill:#1f2328">My Approval Gate</text>
+  <text x="102" y="117" class="f" style="font-size:13px;fill:#59636e">bot</text>
+  <!-- earlier card (decided) -->
+  <rect x="40" y="152" width="330" height="92" rx="14" fill="#fff"/>
+  <text x="56" y="178" class="f" style="font-weight:700;font-size:14px;fill:#1f2328">Claude wants to run an MCP action</text>
+  <text x="56" y="200" class="f" style="font-size:13px;fill:#1f2328">Tool: <tspan class="m">notes_read</tspan>  ·  Server: notes</text>
+  <rect x="56" y="212" width="98" height="22" rx="11" fill="#dafbe1"/>
+  <text x="105" y="227" text-anchor="middle" class="f" style="font-weight:700;font-size:12.5px;fill:#1a7f37">✓ Allowed</text>
+  <!-- live card -->
+  <rect x="40" y="264" width="380" height="390" rx="14" fill="#fff"/>
+  <g transform="translate(56 284)">
+    <rect x="0" y="2" width="14" height="11" rx="2" fill="#0969da"/>
+    <path d="M3 3v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#0969da" stroke-width="2"/>
+  </g>
+  <text x="78" y="296" class="f" style="font-weight:700;font-size:15px;fill:#1f2328">Claude wants to run an MCP action</text>
+  <text x="56" y="328" class="f" style="font-size:14px;fill:#1f2328"><tspan style="font-weight:700">Tool:</tspan> <tspan class="m">write_file</tspan></text>
+  <text x="56" y="350" class="f" style="font-size:14px;fill:#1f2328"><tspan style="font-weight:700">Server:</tspan> filesystem</text>
+  <text x="56" y="372" class="f" style="font-size:14px;fill:#1f2328"><tspan style="font-weight:700">Method:</tspan> <tspan class="m">tools/call</tspan></text>
+  <text x="56" y="396" class="f" style="font-weight:700;font-size:14px;fill:#1f2328">Arguments:</text>
+  <rect x="56" y="406" width="348" height="150" rx="8" fill="#f6f8fa"/>
+  <text x="68" y="428" class="m">{</text>
+  <text x="68" y="448" class="m">  "path": "/Users/me/Desktop/q3.txt",</text>
+  <text x="68" y="468" class="m">  "content": "Revenue up 12%…",</text>
+  <text x="68" y="488" class="m">  "api_key": "«redacted»",</text>
+  <text x="68" y="508" class="m">  "overwrite": false</text>
+  <text x="68" y="528" class="m">}</text>
+  <text x="68" y="548" class="f" style="font-size:11.5px;fill:#59636e">secrets are replaced before sending</text>
+  <text x="56" y="586" class="f" style="font-size:13.5px;fill:#59636e">Auto-blocks in 120s if you don't answer.</text>
+  <text x="404" y="640" text-anchor="end" class="f" style="font-size:11.5px;fill:#8c959f">10:42</text>
+  <!-- buttons -->
+  <rect x="40" y="664" width="186" height="46" rx="12" fill="#ffffff" stroke="#cf222e" stroke-width="2"/>
+  <text x="133" y="693" text-anchor="middle" class="f" style="font-weight:700;font-size:16px;fill:#cf222e">Block</text>
+  <rect x="234" y="664" width="186" height="46" rx="12" fill="#1a7f37"/>
+  <text x="327" y="693" text-anchor="middle" class="f" style="font-weight:700;font-size:16px;fill:#fff">Allow</text>
+  <rect x="40" y="718" width="380" height="46" rx="12" fill="#ffffff" stroke="#0969da" stroke-width="1.5"/>
+  <text x="230" y="747" text-anchor="middle" class="f" style="font-weight:600;font-size:15px;fill:#0969da">Always allow write_file</text>
+</svg>

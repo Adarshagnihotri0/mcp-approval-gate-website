@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" width="1200" height="380" role="img" aria-labelledby="t d">
+  <title id="t">MCP Approval Gate</title>
+  <desc id="d">Claude asks to use a tool, the gate holds it and asks you on Telegram; Allow forwards it to the MCP server, Block returns an error.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#59636e"/></marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1a7f37"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#cf222e"/></marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f3f6fb"/></linearGradient>
+  </defs>
+  <style>
+    .h{font:700 34px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#1f2328}
+    .s{font:400 17px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#59636e}
+    .b{font:600 17px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#1f2328}
+    .m{font:500 14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#1f2328}
+    .w{font:600 15px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#fff}
+    .lbl{font:600 13px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
+  </style>
+  <rect x="1" y="1" width="1198" height="378" rx="18" fill="url(#bg)" stroke="#d1d9e0"/>
+  <text x="48" y="66" class="h">MCP Approval Gate</text>
+  <text x="48" y="96" class="s">Every tool call Claude makes waits for your tap. Anything else is a block.</text>
+
+  <!-- Claude -->
+  <rect x="48" y="150" width="210" height="150" rx="14" fill="#fff" stroke="#d1d9e0"/>
+  <circle cx="153" cy="196" r="24" fill="#eef1f5"/>
+  <path d="M139 184h28a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4h-16l-8 7v-7h-4a4 4 0 0 1-4-4v-14a4 4 0 0 1 4-4z" fill="#59636e"/>
+  <circle cx="146" cy="195" r="2.2" fill="#fff"/><circle cx="153" cy="195" r="2.2" fill="#fff"/><circle cx="160" cy="195" r="2.2" fill="#fff"/>
+  <text x="153" y="246" text-anchor="middle" class="b">Claude</text>
+  <text x="153" y="270" text-anchor="middle" class="s">Desktop / Web</text>
+  <rect x="80" y="282" width="146" height="26" rx="13" fill="#f6f8fa" stroke="#d1d9e0"/>
+  <text x="153" y="300" text-anchor="middle" class="m">tools/call</text>
+
+  <line x1="262" y1="225" x2="372" y2="225" stroke="#59636e" stroke-width="2.5" marker-end="url(#a)"/>
+
+  <!-- Gate -->
+  <rect x="380" y="140" width="250" height="170" rx="16" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+  <path d="M505 162l38 14v30c0 26-16 44-38 54-22-10-38-28-38-54v-30z" fill="#0969da"/>
+  <rect x="491" y="200" width="28" height="22" rx="3" fill="#fff"/>
+  <path d="M497 200v-7a8 8 0 0 1 16 0v7" fill="none" stroke="#fff" stroke-width="3.5"/>
+  <text x="505" y="283" text-anchor="middle" class="b">Approval gate</text>
+  <text x="505" y="302" text-anchor="middle" class="s">holds the request</text>
+
+  <!-- to phone -->
+  <path d="M634 205 C 700 205, 700 165, 762 165" fill="none" stroke="#59636e" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#a)"/>
+  <path d="M762 255 C 700 255, 700 235, 638 235" fill="none" stroke="#59636e" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#a)"/>
+  <text x="698" y="152" text-anchor="middle" class="lbl" fill="#59636e">asks you</text>
+  <text x="698" y="276" text-anchor="middle" class="lbl" fill="#59636e">your tap</text>
+
+  <!-- Phone -->
+  <rect x="770" y="118" width="150" height="230" rx="22" fill="#1f2328"/>
+  <rect x="780" y="132" width="130" height="202" rx="12" fill="#e7eef6"/>
+  <rect x="790" y="146" width="110" height="98" rx="9" fill="#fff"/>
+  <rect x="800" y="158" width="62" height="9" rx="4" fill="#1f2328"/>
+  <rect x="800" y="176" width="88" height="7" rx="3.5" fill="#afb8c1"/>
+  <rect x="800" y="190" width="76" height="7" rx="3.5" fill="#afb8c1"/>
+  <rect x="800" y="204" width="84" height="7" rx="3.5" fill="#afb8c1"/>
+  <rect x="800" y="218" width="54" height="7" rx="3.5" fill="#afb8c1"/>
+  <rect x="790" y="252" width="53" height="30" rx="7" fill="#cf222e"/>
+  <text x="816.5" y="272" text-anchor="middle" class="w" style="font-size:13px">Block</text>
+  <rect x="847" y="252" width="53" height="30" rx="7" fill="#1a7f37"/>
+  <text x="873.5" y="272" text-anchor="middle" class="w" style="font-size:13px">Allow</text>
+  <text x="845" y="318" text-anchor="middle" class="lbl" fill="#59636e">Telegram</text>
+
+  <!-- outcomes -->
+  <line x1="632" y1="170" x2="632" y2="170" stroke="none"/>
+  <rect x="972" y="134" width="190" height="72" rx="12" fill="#dafbe1" stroke="#1a7f37"/>
+  <text x="1067" y="164" text-anchor="middle" class="b" style="fill:#1a7f37">Allow</text>
+  <text x="1067" y="188" text-anchor="middle" class="s">runs on the server</text>
+  <rect x="972" y="230" width="190" height="96" rx="12" fill="#ffebe9" stroke="#cf222e"/>
+  <text x="1067" y="258" text-anchor="middle" class="b" style="fill:#cf222e">Block · timeout · error</text>
+  <text x="1067" y="282" text-anchor="middle" class="s">never reaches it;</text>
+  <text x="1067" y="304" text-anchor="middle" class="s">Claude gets -32001</text>
+  <line x1="924" y1="190" x2="966" y2="172" stroke="#1a7f37" stroke-width="2.5" marker-end="url(#g)"/>
+  <line x1="924" y1="270" x2="966" y2="276" stroke="#cf222e" stroke-width="2.5" marker-end="url(#r)"/>
+</svg>

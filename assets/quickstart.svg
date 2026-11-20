@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 1000 660" width="1000" height="660" role="img" aria-labelledby="t d">
+  <title id="t">Quickstart in the terminal</title>
+  <desc id="d">Terminal output of ./install.sh and mcp-approval-gate quickstart: Telegram paired, background service running, three Claude Desktop servers guarded with a backup, test approval allowed.</desc>
+  <style>
+    .c{font:500 14.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#e6edf3}
+    .d{fill:#8b949e}.g{fill:#3fb950}.y{fill:#d29922}.b{fill:#79c0ff}.w{fill:#ffffff;font-weight:700}.p{fill:#d2a8ff}
+  </style>
+  <rect x="1" y="1" width="998" height="658" rx="14" fill="#0d1117" stroke="#30363d"/>
+  <rect x="1" y="1" width="998" height="40" rx="14" fill="#161b22"/>
+  <rect x="1" y="27" width="998" height="14" fill="#161b22"/>
+  <circle cx="26" cy="21" r="6.5" fill="#ff5f57"/><circle cx="48" cy="21" r="6.5" fill="#febc2e"/><circle cx="70" cy="21" r="6.5" fill="#28c840"/>
+  <text x="500" y="26" text-anchor="middle" class="c d" style="font-size:13px">~/mcp-approval-gate</text>
+  <g class="c">
+    <text x="28" y="74"><tspan class="g">$</tspan> ./install.sh</text>
+    <text x="28" y="98" class="d">Using /opt/homebrew/bin/python3.12 3.12.7</text>
+    <text x="28" y="122"><tspan class="g">✓</tspan> Installed mcp-approval-gate 2.0.0</text>
+    <text x="28" y="156" class="w">━━ MCP Approval Gate quickstart ━━</text>
+    <text x="28" y="190" class="b">Step 1/4 · Telegram</text>
+    <text x="28" y="214" class="d">  Bot token (hidden): ••••••••••••••••</text>
+    <text x="28" y="238">  Send <tspan class="p">/pair Qm7vK2xPz9Lw4aTn</tspan> to your dedicated bot in a PRIVATE chat</text>
+    <text x="28" y="262">  <tspan class="g">✓</tspan> Paired. Credentials saved privately</text>
+    <text x="28" y="296" class="b">Step 2/4 · Background service</text>
+    <text x="28" y="320">  Run the approval daemon in the background at login? [Y/n] <tspan class="w">y</tspan></text>
+    <text x="28" y="344">  <tspan class="g">✓</tspan> Daemon running</text>
+    <text x="28" y="378" class="b">Step 3/4 · Guard Claude Desktop</text>
+    <text x="28" y="402">  • will guard  filesystem</text>
+    <text x="28" y="426">  • will guard  github</text>
+    <text x="28" y="450">  • will guard  notes</text>
+    <text x="28" y="474">  <tspan class="y">⚠ skipped</tspan>     linear: remote connector (no local command)</text>
+    <text x="28" y="498">  Guard 3 server(s) now? (a backup is kept) [Y/n] <tspan class="w">y</tspan></text>
+    <text x="28" y="522">  <tspan class="g">✓</tspan> Done.  <tspan class="y">➜ Quit and reopen Claude Desktop to apply.</tspan></text>
+    <text x="28" y="556" class="b">Step 4/4 · Test</text>
+    <text x="28" y="580">  Sent. Open Telegram and tap Allow or Block…</text>
+    <text x="28" y="604">  <tspan class="g">✓</tspan> You tapped Allow — the gate would have forwarded the request.</text>
+    <text x="28" y="636"><tspan class="g">All set.</tspan> Check any time with: <tspan class="w">mcp-approval-gate status</tspan></text>
+  </g>
+</svg>
