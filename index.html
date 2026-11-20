@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Approval Gate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a single column of "exhibits" — each tool call is a slip that gets stamped ALLOW or BLOCK. */
+:root{
+  --paper:#eef2f7; --card:#ffffff; --ink:#0f1a2e; --muted:#53627a; --line:#d5dde8;
+  --accent:#2f6fed; --accent-soft:#e3ecff;
+  --allow:#1a7f37; --allow-soft:#dcf5e3; --block:#c62828; --block-soft:#fde4e4; --wait:#a06200; --wait-soft:#fff1d6;
+  --code-bg:#0f1a2e; --code-ink:#dbe6ff;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --shadow:0 1px 2px rgba(15,26,46,.06),0 8px 28px rgba(15,26,46,.08);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0b111c; --card:#121b2b; --ink:#e8eef8; --muted:#97a6bf; --line:#24314a;
+  --accent:#6f9bff; --accent-soft:#17264a;
+  --allow:#4cc26b; --allow-soft:#10301c; --block:#ff6b6b; --block-soft:#3a1517; --wait:#f0b44a; --wait-soft:#33260c;
+  --code-bg:#070c15; --code-ink:#dbe6ff; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0b111c; --card:#121b2b; --ink:#e8eef8; --muted:#97a6bf; --line:#24314a;
+  --accent:#6f9bff; --accent-soft:#17264a;
+  --allow:#4cc26b; --allow-soft:#10301c; --block:#ff6b6b; --block-soft:#3a1517; --wait:#f0b44a; --wait-soft:#33260c;
+  --code-bg:#070c15; --code-ink:#dbe6ff; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+img,video{max-width:100%;display:block}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);line-height:1.08;text-wrap:balance;margin:0}
+h2{font-size:clamp(30px,4.2vw,46px);font-weight:800;letter-spacing:-.02em}
+h3{font-size:22px;font-weight:700}
+p{margin:0}
+.lede{color:var(--muted);font-size:19px;max-width:62ch}
+code,.mono{font-family:var(--mono);font-size:.92em}
+section{padding:72px 0;border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:14px;margin-bottom:36px}
+.kicker{font:600 13px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font:800 19px var(--display);color:var(--ink);text-decoration:none}
+.bar nav{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+.bar nav a{color:var(--muted);text-decoration:none;font-size:15px;font-weight:500}
+.bar nav a:hover{color:var(--ink)}
+@media (max-width:820px){.bar nav{display:none}}
+
+/* hero */
+.hero{padding:56px 0 64px;border-top:0}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+@media (max-width:920px){.hero-grid{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(42px,6.4vw,76px);font-weight:800;letter-spacing:-.035em}
+.hero h1 em{font-style:normal;color:var(--accent);position:relative;white-space:nowrap}
+.hero .lede{margin-top:20px}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.fact{font:600 13px var(--mono);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted)}
+.fact b{color:var(--ink)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 16px var(--body);padding:12px 20px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);text-decoration:none;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{transform:translateY(-1px)}
+
+/* the slip simulator */
+.sim{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:22px;position:relative}
+.sim-route{display:grid;grid-template-columns:auto 1fr auto 1fr auto;align-items:center;gap:8px;font:600 13px var(--mono);color:var(--muted);margin-bottom:18px}
+.node{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);min-width:76px;text-align:center}
+.node svg{width:24px;height:24px}
+.node.gate{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.wire{height:3px;border-radius:2px;background:var(--line);position:relative;overflow:visible}
+.pkt{position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:var(--accent);left:0;opacity:0}
+.slip{position:relative;border:1.5px dashed var(--line);border-radius:14px;padding:16px 18px;background:var(--paper)}
+.slip .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;font:600 13px var(--mono);color:var(--muted);margin-bottom:8px}
+.slip pre{margin:0;font:400 14px/1.6 var(--mono);color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.slip .k{color:var(--accent)} .slip .s{color:var(--allow)}
+.stamp{position:absolute;right:18px;top:50%;transform:translateY(-50%) rotate(-12deg) scale(.6);opacity:0;font:800 30px var(--display);letter-spacing:.06em;padding:6px 14px;border:4px solid currentColor;border-radius:10px;transition:transform .35s cubic-bezier(.2,1.6,.4,1),opacity .2s}
+.stamp.on{opacity:.92;transform:translateY(-50%) rotate(-12deg) scale(1)}
+.stamp.allow{color:var(--allow)} .stamp.block{color:var(--block)} .stamp.wait{color:var(--wait)}
+.timer{display:flex;align-items:center;gap:10px;margin:14px 0 4px;font:600 14px var(--mono);color:var(--muted)}
+.meter{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:100%;background:var(--wait);transform-origin:0 50%}
+.sim-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.sim-btns button{font:600 15px var(--body);padding:12px 10px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.sim-btns .allow{background:var(--allow);border-color:var(--allow);color:#fff}
+.sim-btns .block{background:var(--block);border-color:var(--block);color:#fff}
+.sim-btns button:disabled{opacity:.45;cursor:default}
+.result{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:15px;background:var(--paper);border:1px solid var(--line);min-height:50px}
+.result b{font-family:var(--mono)}
+.result.allow{background:var(--allow-soft);border-color:transparent} .result.block{background:var(--block-soft);border-color:transparent}
+
+/* generic blocks */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media (max-width:520px){.grid3,.grid4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.card p{color:var(--muted);margin-top:8px;font-size:16px}
+.figure{background:#fff;border:1px solid var(--line);border-radius:18px;overflow-x:auto;box-shadow:var(--shadow)}
+.figure img{min-width:720px;width:100%}
+.caption{color:var(--muted);font-size:15px;margin-top:12px}
+
+/* message lanes */
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.lanes{grid-template-columns:1fr}}
+.lane{border-radius:18px;padding:20px;border:1px solid var(--line);background:var(--card)}
+.lane h3{display:flex;align-items:center;gap:10px}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font:600 14px var(--mono);padding:7px 11px;border-radius:9px;background:var(--paper);border:1px solid var(--line)}
+.lane.pass .chip{border-color:color-mix(in srgb,var(--allow) 40%,var(--line))}
+.lane.hold .chip{border-color:color-mix(in srgb,var(--wait) 50%,var(--line))}
+
+/* video */
+.video{border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:#000}
+
+/* steps */
+.steps{display:grid;gap:16px;counter-reset:s}
+.step{display:grid;grid-template-columns:56px 1fr;gap:18px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.step .n{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:800 20px var(--display);background:var(--accent-soft);color:var(--accent)}
+.step p{color:var(--muted);margin-top:6px}
+.cmd{display:flex;align-items:center;gap:10px;margin-top:12px;background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:12px 14px;font:400 15px var(--mono);overflow-x:auto}
+.cmd span{white-space:nowrap}
+.cmd .p{color:#7ee2a0}
+.cmd button{margin-left:auto;flex:none;font:600 12px var(--mono);padding:6px 10px;border-radius:8px;border:1px solid #2c3b58;background:#17233a;color:#cfe0ff;cursor:pointer}
+
+/* evidence timeline */
+.timeline{display:grid;gap:22px}
+.tl{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:start}
+@media (max-width:760px){.tl{grid-template-columns:1fr}}
+.tl .when{font:600 14px var(--mono);color:var(--muted);padding-top:6px}
+.tl .when b{display:block;font:800 22px var(--display);color:var(--ink)}
+.shot{border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
+.tag{display:inline-flex;align-items:center;gap:6px;font:700 13px var(--mono);padding:5px 10px;border-radius:999px}
+.tag.allow{background:var(--allow-soft);color:var(--allow)} .tag.block{background:var(--block-soft);color:var(--block)} .tag.wait{background:var(--wait-soft);color:var(--wait)} .tag.info{background:var(--accent-soft);color:var(--accent)}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.phones img{border-radius:18px;border:1px solid var(--line)}
+
+/* fail closed list */
+.nos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:22px}
+.no{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--block-soft);color:var(--ink);font-size:15px}
+.no::before{content:"✕";font-weight:800;color:var(--block)}
+.yes{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--allow-soft);font-weight:600}
+.yes::before{content:"✓";font-weight:800;color:var(--allow)}
+
+/* redaction */
+.redact{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.redact{grid-template-columns:1fr}}
+.code{background:var(--code-bg);color:var(--code-ink);border-radius:14px;padding:16px 18px;font:400 14px/1.7 var(--mono);overflow-x:auto;white-space:pre}
+.code .r{background:rgba(255,107,107,.18);color:#ff9b9b;border-radius:5px;padding:0 4px}
+.code .h{color:#ffcf8a}
+.code .s{color:#9be3b0}
+.code .k{color:#9dbaff}
+.code .c{color:#6f7f9c}
+
+/* table */
+.table{width:100%;border-collapse:collapse;font-size:15px}
+.table th,.table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.table th{font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.table td:first-child{font-weight:600;white-space:nowrap}
+.tbl-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:18px}
+
+/* numbers */
+.num{font:800 54px/1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.num.a{color:var(--accent)} .num.g{color:var(--allow)} .num.w{color:var(--wait)}
+
+/* tip */
+.tip{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px}
+@media (max-width:860px){.tip{grid-template-columns:1fr}}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vs div{border-radius:14px;padding:16px;text-align:center;font-weight:600}
+.vs .x{background:var(--block-soft)} .vs .ok{background:var(--allow-soft)}
+.vs big{display:block;font:800 34px var(--display)}
+.note{margin-top:16px;padding:14px 16px;border-left:4px solid var(--wait);background:var(--wait-soft);border-radius:10px;font-size:15px}
+
+/* faq */
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 18px}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-weight:600;padding:14px 0;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::after{content:"+";font:700 20px var(--mono);color:var(--muted)}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);padding:0 0 16px}
+
+footer{padding:48px 0 64px;border-top:1px solid var(--line);color:var(--muted);font-size:15px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#top" aria-label="MCP Approval Gate home"><svg width="26" height="30" viewBox="0 0 30 34" aria-hidden="true"><path d="M15 1l13 5v10c0 9-6 14.5-13 17C8 30.5 2 25 2 16V6z" fill="#2f6fed"/><rect x="10" y="14" width="10" height="8" rx="1.5" fill="#fff"/><path d="M12 14v-3a3 3 0 0 1 6 0v3" fill="none" stroke="#fff" stroke-width="2"/></svg>MCP Approval Gate</a>
+  <nav aria-label="Sections"><a href="#how">How it works</a><a href="#watch">Watch</a><a href="#install">Install</a><a href="#proof">Real run</a><a href="#security">Security</a><a href="#tests">Tests</a><a href="#faq">FAQ</a></nav>
+</div></header>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero"><div class="wrap hero-grid">
+  <div>
+    <div class="kicker">Python · Claude Desktop &amp; Web · Telegram</div>
+    <h1 style="margin-top:16px">Every tool call waits for <em>your yes</em>.</h1>
+    <p class="lede">MCP Approval Gate sits between Claude and its MCP servers. When Claude wants to write a file, open a pull request or read your data, the request is held and your phone shows exactly what it wants. Allow runs it. Block, silence or any failure stops it.</p>
+    <div class="facts"><span class="fact"><b>0</b> runtime dependencies</span><span class="fact"><b>129</b> tests</span><span class="fact">mypy <b>--strict</b></span><span class="fact">fail-closed</span></div>
+    <div class="cta"><a class="btn primary" href="#install">Install in 2 minutes</a><a class="btn" href="#watch">Watch the 45-second tour</a></div>
+  </div>
+
+  <div class="sim" aria-label="Try the gate">
+    <div class="sim-route" aria-hidden="true">
+      <div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v10H9l-5 4z"/></svg>Claude</div>
+      <div class="wire"><span class="pkt" id="pkt1"></span></div>
+      <div class="node gate"><svg viewBox="0 0 30 34"><path d="M15 1l13 5v10c0 9-6 14.5-13 17C8 30.5 2 25 2 16V6z" fill="#2f6fed"/></svg>Gate</div>
+      <div class="wire"><span class="pkt" id="pkt2"></span></div>
+      <div class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/></svg>Server</div>
+    </div>
+    <div class="slip" id="slip">
+      <div class="hd"><span>tools/call · id 7</span><span id="slipServer">server: guarded-notes</span></div>
+      <pre id="slipBody"></pre>
+      <div class="stamp" id="stamp">HELD</div>
+    </div>
+    <div class="timer"><span id="timerLabel">Auto-blocks in 12 s</span><div class="meter"><i id="meter"></i></div></div>
+    <div class="sim-btns">
+      <button class="block" id="bBlock" type="button">Block</button>
+      <button class="allow" id="bAllow" type="button">Allow</button>
+      <button id="bNext" type="button">Next request</button>
+    </div>
+    <div class="result" id="result" role="status" aria-live="polite">The gate is holding this request and asking you on Telegram. Tap Allow, tap Block, or do nothing.</div>
+    <p class="caption" style="font-size:13px">Simulation. The real timeout is 120 s; it is shortened to 12 s here.</p>
+  </div>
+</div></section>
+
+<!-- HOW IT WORKS -->
+<section id="how"><div class="wrap">
+  <div class="sec-head"><div class="kicker">How it works</div><h2>A checkpoint inside the MCP pipe</h2>
+  <p class="lede">Claude Desktop starts every MCP server itself and talks to it in JSON-RPC over stdin/stdout. One command rewrites each server's launch line so Claude starts the gate first, and the gate starts the real server behind it. Claude still sees the same server and the same tools.</p></div>
+
+  <div class="lanes">
+    <div class="lane pass"><h3><span class="dot" style="background:var(--allow)"></span>Passes straight through</h3><p class="caption">Setup and listing. Blocking these would only make Claude think the server is broken.</p>
+      <div class="chips"><span class="chip">initialize</span><span class="chip">ping</span><span class="chip">tools/list</span><span class="chip">resources/list</span><span class="chip">prompts/list</span><span class="chip">notifications/*</span></div></div>
+    <div class="lane hold"><h3><span class="dot" style="background:var(--wait)"></span>Held until you decide</h3><p class="caption">Anything that does something, plus any method the gate does not recognise.</p>
+      <div class="chips"><span class="chip">tools/call</span><span class="chip">resources/read</span><span class="chip">prompts/get</span><span class="chip">anything unknown</span></div></div>
+  </div>
+
+  <div style="margin-top:28px" class="figure"><img src="assets/architecture.svg" alt="Architecture: one gate proxy per Claude Desktop server, all asking one approval daemon over a private Unix socket; the daemon is the only Telegram poller and asks your paired chat." loading="lazy"></div>
+  <p class="caption">Why one daemon: Telegram lets only one process read a bot's messages, while Claude Desktop starts every server at once. One background daemon owns the bot, and every proxy asks it over a private socket.</p>
+
+  <div style="margin-top:28px" class="figure"><img src="assets/request-flow.svg" alt="Sequence of one tool call: held by the proxy, card sent to your phone, Allow forwards it, Block returns error -32001, cancellation withdraws the card." loading="lazy"></div>
+</div></section>
+
+<!-- WATCH -->
+<section id="watch"><div class="wrap">
+  <div class="sec-head"><div class="kicker">Watch · 45 seconds</div><h2>Install, connect, approve</h2>
+  <p class="lede">The whole onboarding in one take: install, pair Telegram, guard Claude Desktop, then approve and block real requests from a phone.</p></div>
+  <div class="video"><video controls preload="metadata" poster="assets/poster.jpg" playsinline><source src="assets/onboarding.mp4" type="video/mp4">Your browser cannot play this video.</video></div>
+</div></section>
+
+<!-- INSTALL -->
+<section id="install"><div class="wrap">
+  <div class="sec-head"><div class="kicker">Install · macOS &amp; Linux · Python 3.10+</div><h2>Four steps, one guided command</h2>
+  <p class="lede">The installer creates a private environment (no sudo, system Python untouched) and walks you through everything else.</p></div>
+  <div class="steps">
+    <div class="step"><div class="n">0</div><div><h3>Install</h3><p>Clone the project and run the installer. It starts the guided quickstart for you.</p>
+      <div class="cmd"><span><span class="p">$</span> git clone https://github.com/OWNER/mcp-approval-gate.git &amp;&amp; cd mcp-approval-gate &amp;&amp; ./install.sh</span><button type="button" data-copy="git clone https://github.com/OWNER/mcp-approval-gate.git && cd mcp-approval-gate && ./install.sh">Copy</button></div></div></div>
+    <div class="step"><div class="n">1</div><div><h3>Connect Telegram</h3><p>Create a bot with @BotFather (<code>/newbot</code>), paste its token, then send the one-time <code>/pair &lt;code&gt;</code> shown on your computer to the bot from a private chat. The bot answers “MCP Approval Gate is online”.</p></div></div>
+    <div class="step"><div class="n">2</div><div><h3>Run it in the background</h3><p>The approval daemon becomes a login service (launchd on macOS, systemd on Linux) and restarts itself if it ever crashes.</p></div></div>
+    <div class="step"><div class="n">3</div><div><h3>Guard Claude Desktop</h3><p>Every MCP server in <code>claude_desktop_config.json</code> is routed through the gate. You see the list first, and a backup is kept. Restart Claude Desktop once.</p>
+      <div class="cmd"><span><span class="p">$</span> mcp-approval-gate wrap-desktop</span><button type="button" data-copy="mcp-approval-gate wrap-desktop">Copy</button></div></div></div>
+    <div class="step"><div class="n">4</div><div><h3>Send yourself a test</h3><p>A sample approval arrives on your phone. Tap Allow or Block to confirm the round trip.</p>
+      <div class="cmd"><span><span class="p">$</span> mcp-approval-gate test</span><button type="button" data-copy="mcp-approval-gate test">Copy</button></div></div></div>
+  </div>
+</div></section>
+
+<!-- ONE APPROVAL TIP -->
+<section><div class="wrap">
+  <div class="tip">
+    <div>
+      <div class="kicker">Tip · one approval instead of two</div>
+      <h2 style="margin-top:12px;font-size:clamp(26px,3.4vw,36px)">Set tools to “Always allow” in Claude. Your phone still decides.</h2>
+      <p class="lede" style="margin-top:14px;font-size:17px">Claude's own permission prompt and the gate are separate layers. “Always allow” in Claude only stops Claude's on-screen popup. The gate sits in the pipe underneath, so every action still waits for your tap on Telegram, and silence or an outage still blocks it.</p>
+      <div class="note">Do not tap <b>Always allow</b> on the Telegram card unless you mean it: that one switches off the gate's question for that tool until <code>/clear</code> or a restart. And check <code>mcp-approval-gate status</code>: a server marked <b>UNGUARDED</b> has no gate behind it.</div>
+    </div>
+    <div class="vs"><div class="x"><big>✕</big>Claude popup<br><span style="font-weight:400;color:var(--muted)">turned off</span></div><div class="ok"><big>✓</big>Your phone<br><span style="font-weight:400;color:var(--muted)">asks every time</span></div></div>
+  </div>
+</div></section>
+
+<!-- PROOF -->
+<section id="proof"><div class="wrap">
+  <div class="sec-head"><div class="kicker">Real run · Claude Desktop · 20 Nov 2026</div><h2>One request blocked by silence, one allowed by a tap</h2>
+  <p class="lede">Frames from a real screen recording and the phone in the same session. The prompt asked Claude to read <code>Hopper GIF Picker.html</code> through the guarded-notes connector.</p></div>
+  <div class="timeline">
+    <div class="tl"><div class="when"><b>Setup</b>connector</div><div><div class="shot"><img src="assets/rec_5.jpg" alt="Claude Desktop tool permissions for guarded-notes: notes write, notes read, html list, html read." loading="lazy"></div><p class="caption">The guarded-notes connector exposes four tools. Every call to them goes through the gate.</p></div></div>
+    <div class="tl"><div class="when"><b>8:44 PM</b>attempt 1</div><div><div class="grid2"><div class="shot"><img src="assets/rec_13.jpg" alt="Claude Desktop's own permission dialog: Claude wants to use Html read from guarded-notes, with Deny, Always allow and Allow once." loading="lazy"></div><div class="shot"><img src="assets/rec_20.jpg" alt="Claude Desktop waiting on Html read with the request filename Hopper GIF Picker.html." loading="lazy"></div></div>
+      <p class="caption"><span class="tag info">Layer 1</span> Claude's own prompt: “Allow once” only lets Claude send the call. <span class="tag wait">Layer 2</span> The gate holds <code>html_read</code> and sends the card to Telegram. Nobody answered, so after 120 s the card closed itself: <span class="tag block">No answer — blocked</span>. The file was never read.</p></div></div>
+    <div class="tl"><div class="when"><b>8:45 PM</b>attempt 2</div><div><div class="shot"><img src="assets/rec_160.jpg" alt="The HTML file read through the approved call, rendered in Claude as the Hopper GIF Picker preview." loading="lazy"></div>
+      <p class="caption">Same request, tapped <span class="tag allow">Allowed</span> on the phone after about 14 s. The gate forwarded it, the server returned the HTML, and Claude rendered it. Publishing it as an Artifact failed only because the Claude free-plan message limit was reached, which is unrelated to the gate.</p></div></div>
+    <div class="tl"><div class="when"><b>Phone</b>the same cards</div><div><div class="phones"><img src="assets/phone_844_845.jpg" alt="Telegram on the phone: html_read at 8:44 PM marked No answer — blocked, and html_read at 8:45 PM marked Allowed." loading="lazy"><img src="assets/phone_states.jpg" alt="Telegram on the phone: an earlier html_list card marked Allowed and the self-test card." loading="lazy"></div>
+      <p class="caption">Each card shows tool, server and arguments, and is stamped with what happened.</p></div></div>
+  </div>
+</div></section>
+
+<!-- FAIL CLOSED -->
+<section><div class="wrap">
+  <div class="sec-head"><div class="kicker">The core rule</div><h2>Fail-closed: one way in, many ways to “no”</h2>
+  <p class="lede">The gate never forwards by default. Anything it cannot positively confirm returns JSON-RPC error <code>-32001</code> to Claude, and the server never sees the request.</p></div>
+  <div class="yes">You tapped Allow: paired user, private chat, this exact card, in time. The only path that runs anything.</div>
+  <div class="nos">
+    <div class="no">You tapped Block</div><div class="no">No answer within 120 s</div><div class="no">Telegram unreachable</div><div class="no">Approval daemon down</div>
+    <div class="no">Claude cancelled the call</div><div class="no">Approvals switched off (/pairout)</div><div class="no">A tap from anyone else</div><div class="no">An old or replayed button</div>
+    <div class="no">More than 32 waiting</div><div class="no">Malformed or ambiguous JSON</div><div class="no">Audit log can't be written</div><div class="no">Gate stopped or crashed</div>
+  </div>
+</div></section>
+
+<!-- SECURITY -->
+<section id="security"><div class="wrap">
+  <div class="sec-head"><div class="kicker">Security</div><h2>Who can approve, and what leaves your machine</h2></div>
+  <div class="grid4">
+    <div class="card"><h3>Pairing</h3><p>A one-time code shown on your computer, sent from a private chat, binds one Telegram user and one chat.</p></div>
+    <div class="card"><h3>Every tap</h3><p>Each card has its own 128-bit code. User, chat, message and code are all checked; forged or replayed taps do nothing.</p></div>
+    <div class="card"><h3>24-hour session</h3><p>Approvals expire on their own. <code>/pairout</code> turns them off instantly; renewing needs a fresh code shown locally.</p></div>
+    <div class="card"><h3>Local only</h3><p>The daemon socket is owner-only. The bot token never appears in Claude's config, command lines or logs.</p></div>
+  </div>
+
+  <h3 style="margin:40px 0 14px">Secrets are redacted before a card is sent</h3>
+  <div class="redact">
+    <div><div class="kicker" style="margin-bottom:10px;color:var(--muted)">What Claude sent</div>
+<div class="code">{
+  <span class="k">"path"</span>: <span class="s">"/Users/me/q3.txt"</span>,
+  <span class="k">"api_key"</span>: <span class="h">"sk-ant-api03-Xk2…"</span>,
+  <span class="k">"db_url"</span>: <span class="s">"postgres://</span><span class="h">admin:hunter2</span><span class="s">@db/app"</span>,
+  <span class="k">"webhook"</span>: <span class="s">"https://x.io/h?token=</span><span class="h">QWERTY123</span><span class="s">"</span>,
+  <span class="k">"city"</span>: <span class="s">"Kanpur"</span>
+}</div></div>
+    <div><div class="kicker" style="margin-bottom:10px;color:var(--muted)">What your phone shows</div>
+<div class="code">{
+  <span class="k">"path"</span>: <span class="s">"/Users/me/q3.txt"</span>,
+  <span class="k">"api_key"</span>: <span class="r">«redacted»</span>,
+  <span class="k">"db_url"</span>: <span class="s">"postgres://</span><span class="r">«redacted»</span><span class="s">@db/app"</span>,
+  <span class="k">"webhook"</span>: <span class="s">"https://x.io/h?token=</span><span class="r">«redacted»</span><span class="s">"</span>,
+  <span class="k">"city"</span>: <span class="s">"Kanpur"</span>     <span class="c">// ordinary values stay readable</span>
+}</div></div>
+  </div>
+  <p class="caption">Covered by tests: API keys, GitHub and Slack tokens, AWS and Google keys, JWTs, bearer headers, PEM private keys, <code>user:pass@</code> in URLs, <code>?token=</code> parameters and <code>password=</code> in text, 22 forms in all. Telegram is not end-to-end encrypted, so you can also hide arguments entirely, or use the local popup approver instead.</p>
+</div></section>
+
+<!-- TESTS -->
+<section id="tests"><div class="wrap">
+  <div class="sec-head"><div class="kicker">Testing</div><h2>Checked against real MCP servers, not mocks</h2>
+  <p class="lede">The tests start real MCP server processes, so “a blocked request never reaches the server” is verified on disk.</p></div>
+  <div class="grid4">
+    <div class="card"><div class="num a">129</div><p>automated tests on macOS and Linux, Python 3.10 – 3.13</p></div>
+    <div class="card"><div class="num a">20</div><p>security tests, each named after the attack it stops</p></div>
+    <div class="card"><div class="num w">3,000</div><p>crafted messages fuzzed with every decision set to Block</p></div>
+    <div class="card"><div class="num g">0</div><p>actions forwarded in that fuzz run</p></div>
+  </div>
+  <div class="tbl-wrap" style="margin-top:24px"><table class="table">
+    <thead><tr><th>Suite</th><th>Tests</th><th>Proves</th></tr></thead>
+    <tbody>
+      <tr><td>Proxy core</td><td class="mono">43</td><td>What passes and what waits, denied requests never written to the server, cancellation, server crashes, HTTP auth and limits</td></tr>
+      <tr><td>Telegram</td><td class="mono">23</td><td>Pairing, private-chat checks, button validation, polling failures, session security</td></tr>
+      <tr><td>Security</td><td class="mono">20</td><td>Redaction, card size limits, forged and replayed taps, socket permissions, flooding, fuzzing</td></tr>
+      <tr><td>Daemon</td><td class="mono">12</td><td>Six parallel requests with mixed answers, late taps, session expiry and renewal, end to end with a real server</td></tr>
+      <tr><td>Product &amp; examples</td><td class="mono">31</td><td>Installer output, Claude config wrap and undo, service files, CLI, example servers</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<!-- COMMANDS -->
+<section><div class="wrap">
+  <div class="sec-head"><div class="kicker">Everyday commands</div><h2>Run it, check it, undo it</h2></div>
+  <div class="tbl-wrap"><table class="table">
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>mcp-approval-gate status</code></td><td>Daemon health, session time left, which Claude servers are guarded</td></tr>
+      <tr><td><code>mcp-approval-gate test</code></td><td>Sends a sample approval to your phone</td></tr>
+      <tr><td><code>mcp-approval-gate renew</code></td><td>Turns approvals back on for 24 hours without restarting anything</td></tr>
+      <tr><td><code>mcp-approval-gate wrap-desktop</code></td><td>Guards servers you added later (safe to run again)</td></tr>
+      <tr><td><code>mcp-approval-gate activity</code></td><td>Recent decisions: time, server, tool, outcome; never arguments</td></tr>
+      <tr><td><code>mcp-approval-gate uninstall</code></td><td>Restores Claude Desktop exactly and removes the service</td></tr>
+    </tbody></table></div>
+  <p class="caption">In the Telegram chat: <code>/status</code>, <code>/rules</code>, <code>/clear</code> and <code>/pairout</code>.</p>
+</div></section>
+
+<!-- FAQ -->
+<section id="faq"><div class="wrap">
+  <div class="sec-head"><div class="kicker">FAQ</div><h2>Questions people ask</h2></div>
+  <details><summary>What can it not guard?</summary><p>Anything that never passes through your computer: connectors hosted by Anthropic (Settings → Connectors), web search, file upload and artifacts. It guards every local server in Claude Desktop's config, and your own remote server used as a Claude Web custom connector through HTTP mode.</p></details>
+  <details><summary>What happens if my phone is off?</summary><p>After 120 seconds the request is blocked and Claude gets an error. Claude can ask again later.</p></details>
+  <details><summary>Will I get a card every time Claude starts?</summary><p>No. Connecting and listing tools pass automatically. Only actions ask.</p></details>
+  <details><summary>Can Claude do several things at once?</summary><p>Yes. Each request gets its own card and its own answer. If Claude cancels one while you decide, its card is withdrawn and a late tap does nothing.</p></details>
+  <details><summary>Does it cost anything?</summary><p>No. It runs on your computer, the Telegram Bot API is free, and there are no AI calls or cloud services.</p></details>
+  <details><summary>Does it work on Windows?</summary><p>The Telegram daemon, the background service and the installer need macOS or Linux. The local popup approver is plain Python and may work on Windows, but it is only tested on macOS and Linux.</p></details>
+</div></section>
+</main>
+
+<footer><div class="wrap"><span>MCP Approval Gate · MIT License · Python standard library only</span><span>Claude does the work. You get the final say.</span></div></footer>
+
+<script>
+(function(){
+  // ---- copy buttons ----
+  document.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=b.getAttribute('data-copy');
+      try{ navigator.clipboard.writeText(t).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1400)},function(){b.textContent='Select & copy'}) }catch(e){ b.textContent='Select & copy' }
+    });
+  });
+
+  // ---- gate simulator ----
+  var REQS=[
+    {server:'guarded-notes',tool:'html_read',args:{filename:'Hopper GIF Picker.html'}},
+    {server:'filesystem',tool:'write_file',args:{path:'/Users/me/Desktop/q3.txt',content:'Revenue up 12%…'}},
+    {server:'github',tool:'create_pull_request',args:{repo:'me/app',title:'Fix login',base:'main'}}
+  ];
+  var LIMIT=12, idx=0, left=LIMIT, timer=null, state='held';
+  var $=function(id){return document.getElementById(id)};
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function body(r){
+    var lines=['<span class="k">"name"</span>: <span class="s">"'+esc(r.tool)+'"</span>,','<span class="k">"arguments"</span>: {'];
+    var ks=Object.keys(r.args); ks.forEach(function(k,i){lines.push('  <span class="k">"'+esc(k)+'"</span>: <span class="s">"'+esc(r.args[k])+'"</span>'+(i<ks.length-1?',':''))});
+    lines.push('}'); return lines.join('\n');
+  }
+  function fly(el,from,to,ms,after){
+    if(reduce){el.style.opacity=0;after&&after();return}
+    el.style.transition='none'; el.style.left=from+'%'; el.style.opacity=1;
+    requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.transition='left '+ms+'ms cubic-bezier(.4,0,.2,1)'; el.style.left=to+'%';})});
+    setTimeout(function(){el.style.opacity=0;after&&after()},ms+60);
+  }
+  function setStamp(cls,text){var s=$('stamp'); s.className='stamp '+cls; s.textContent=text; void s.offsetWidth; s.classList.add('on')}
+  function finish(kind,msg){
+    state=kind; clearInterval(timer); $('bAllow').disabled=true; $('bBlock').disabled=true;
+    var res=$('result'); res.className='result '+(kind==='allowed'?'allow':'block'); res.innerHTML=msg;
+  }
+  function load(){
+    var r=REQS[idx%REQS.length]; state='held'; left=LIMIT;
+    $('slipServer').textContent='server: '+r.server; $('slipBody').innerHTML=body(r);
+    $('bAllow').disabled=false; $('bBlock').disabled=false;
+    $('result').className='result'; $('result').textContent='The gate is holding this request and asking you on Telegram. Tap Allow, tap Block, or do nothing.';
+    setStamp('wait','HELD'); tick(); clearInterval(timer); timer=setInterval(function(){left--;tick(); if(left<=0){ setStamp('block','BLOCKED'); finish('blocked','<b>No answer — blocked.</b> The timeout ran out, so Claude received error <b>-32001</b>. The server never saw the request.'); }},1000);
+    fly($('pkt1'),0,100,700);
+  }
+  function tick(){ $('timerLabel').textContent=left>0?('Auto-blocks in '+left+' s'):'Timed out'; $('meter').style.transform='scaleX('+Math.max(0,left/LIMIT)+')'; }
+  $('bAllow').addEventListener('click',function(){ if(state!=='held')return; setStamp('allow','ALLOWED'); finish('allowed','<b>Allowed.</b> Only now is the request forwarded; the server runs <b>'+esc(REQS[idx%REQS.length].tool)+'</b> and Claude gets the result.'); fly($('pkt2'),0,100,700); });
+  $('bBlock').addEventListener('click',function(){ if(state!=='held')return; setStamp('block','BLOCKED'); finish('blocked','<b>Blocked.</b> Claude received error <b>-32001</b>. The server never saw the request.'); });
+  $('bNext').addEventListener('click',function(){ idx++; load(); });
+  load();
+})();
+</script>
+</body>
+</html>

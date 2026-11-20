@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" width="1200" height="470" role="img" aria-labelledby="t d">
+  <title id="t">Fail closed</title>
+  <desc id="d">Only an explicit Allow tap from the paired person forwards a request. Block, no answer, Telegram offline, daemon down, Claude cancelled, approvals off, too many waiting, malformed request, or a gate crash all block it.</desc>
+  <defs>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1a7f37"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#cf222e"/></marker>
+  </defs>
+  <style>
+    .t{font:700 22px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#1f2328}
+    .h{font:700 17px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
+    .s{font:400 14px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#1f2328}
+    .q{font:400 13px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#59636e}
+  </style>
+  <rect x="1" y="1" width="1198" height="468" rx="18" fill="#fff" stroke="#d1d9e0"/>
+  <text x="40" y="50" class="t">Fail closed: one way in, many ways to "no"</text>
+  <text x="40" y="74" class="q">The gate never forwards by default. Anything it cannot positively confirm is a block.</text>
+
+  <rect x="40" y="200" width="200" height="90" rx="14" fill="#f6f8fa" stroke="#d1d9e0"/>
+  <text x="140" y="238" text-anchor="middle" class="h" fill="#1f2328">A tool call</text>
+  <text x="140" y="262" text-anchor="middle" class="q">arrives at the gate</text>
+
+  <path d="M240 230 C 330 230, 330 150, 420 150" fill="none" stroke="#1a7f37" stroke-width="3" marker-end="url(#g)"/>
+  <path d="M240 262 C 330 262, 330 330, 420 330" fill="none" stroke="#cf222e" stroke-width="3" marker-end="url(#r)"/>
+
+  <rect x="428" y="104" width="330" height="92" rx="14" fill="#dafbe1" stroke="#1a7f37" stroke-width="2"/>
+  <text x="593" y="140" text-anchor="middle" class="h" fill="#1a7f37">You tapped Allow</text>
+  <text x="593" y="164" text-anchor="middle" class="q">paired user · private chat · this card · in time</text>
+  <line x1="758" y1="150" x2="848" y2="150" stroke="#1a7f37" stroke-width="3" marker-end="url(#g)"/>
+  <rect x="856" y="110" width="300" height="80" rx="14" fill="#1a7f37"/>
+  <text x="1006" y="146" text-anchor="middle" class="h" fill="#fff">Forwarded to the server</text>
+  <text x="1006" y="170" text-anchor="middle" style="font:400 13px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#dafbe1">the only path that runs anything</text>
+
+  <rect x="428" y="216" width="520" height="228" rx="14" fill="#ffebe9" stroke="#cf222e" stroke-width="2"/>
+  <text x="448" y="246" class="h" fill="#cf222e">Everything else</text>
+  <g class="s">
+    <text x="448" y="278">✕  You tapped Block</text>
+    <text x="448" y="304">✕  No answer within 120 s</text>
+    <text x="448" y="330">✕  Telegram unreachable</text>
+    <text x="448" y="356">✕  Approval daemon down</text>
+    <text x="448" y="382">✕  Claude cancelled the call</text>
+    <text x="448" y="408">✕  Approvals off (expired / /pairout)</text>
+    <text x="700" y="278">✕  Tap from anyone else</text>
+    <text x="700" y="304">✕  Old or replayed button</text>
+    <text x="700" y="330">✕  More than 32 waiting</text>
+    <text x="700" y="356">✕  Malformed or ambiguous JSON</text>
+    <text x="700" y="382">✕  Audit log can't be written</text>
+    <text x="700" y="408">✕  Gate stopped or crashed</text>
+  </g>
+  <line x1="948" y1="330" x2="1010" y2="330" stroke="#cf222e" stroke-width="3" marker-end="url(#r)"/>
+  <rect x="1018" y="282" width="138" height="96" rx="14" fill="#cf222e"/>
+  <text x="1087" y="318" text-anchor="middle" class="h" fill="#fff">Blocked</text>
+  <text x="1087" y="342" text-anchor="middle" style="font:500 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#fff">error -32001</text>
+  <text x="1087" y="362" text-anchor="middle" style="font:400 12px -apple-system,'Segoe UI',Helvetica,Arial,sans-serif;fill:#ffebe9">server never sees it</text>
+</svg>
